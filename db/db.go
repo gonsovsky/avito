@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
 var conStr = "mongodb+srv://db:Abc12345@cluster0-fqjlw.gcp.mongodb.net/test?retryWrites=true&w=majority"
@@ -49,6 +50,7 @@ func NewPage(page AvitoPage) (AvitoPage, error) {
 	}
 	ctx := context.TODO()
 	col := client.Database("db").Collection("avito")
+	page.Date = time.Now()
 	res, err := col.InsertOne(ctx, page)
 	if err != nil {
 		return AvitoPage{}, err

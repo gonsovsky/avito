@@ -1,14 +1,19 @@
 package shared
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type AvitoPage struct {
-	URL string
-	Title string
-	Price string
+	Hint     string
+	Url      string
+	Title    string
+	Price    string
 	PriceInt string
-	Image string
-	Id string `json:"_id,omitempty" bson:"_id,omitempty"`
+	Image    string
+	Date     time.Time
+	Id       string `json:"_id,omitempty" bson:"_id,omitempty"`
 }
 
 func (page AvitoPage) Dump() {

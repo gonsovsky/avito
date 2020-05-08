@@ -1,0 +1,13 @@
+{{ define "Edit" }}
+    {{ template "Header" }}
+    {{ template "Menu" }}
+    <h3>Edit Avito Page</h3>
+    <form method="POST" action="update">
+        <input type="hidden" name="uid" value="{{ .Id }}" />
+        <label> Url </label><input type="text" name="url" value="{{ .Url }}"  /><br />
+        <label> Hint </label><input type="text" name="hint" value="{{ .Hint }}"  /><br />
+        <br>
+        <input type="submit" value="Save page" />
+    </form><br />
+    {{ template "Footer" }}
+{{ end }}

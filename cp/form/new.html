@@ -1,0 +1,13 @@
+{{ define "New" }}
+    {{ template "Header" }}
+    {{ template "Menu" }}
+    <h3>New Avito Page</h3>
+    <form method="POST" action="insert">
+        <label> Url </label><input type="text" name="url" /><br />
+        <label> Hint </label><input type="text" name="hint" /><br />
+        <br>
+        <input type="submit" value="Add new page" />
+
+    </form>
+    {{ template "Footer" }}
+{{ end }}
