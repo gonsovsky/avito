@@ -1,13 +1,12 @@
 package grabber
 
 import (
+	. "avito/shared"
 	"fmt"
 	"log"
 	"net/http"
-	."newOne/shared"
 	"strings"
 )
-
 
 func Grab(url string) (AvitoPage, error) {
 	x := AvitoPage{}
@@ -27,16 +26,16 @@ func Grab(url string) (AvitoPage, error) {
 	}
 
 	doc.Find("span.title-info-title-text").Each(func(_ int, s *goquery.Selection) {
-		x.Title=s.Text()
+		x.Title = s.Text()
 	})
 	doc.Find("span.js-item-price").Each(func(_ int, s *goquery.Selection) {
 		x.Price = s.Text()
 		x.PriceInt, _ = s.Attr("content")
 	})
 	doc.Find("span.gallery-img-cover").Each(func(_ int, s *goquery.Selection) {
-		var n,_ = s.Attr("style")
+		var n, _ = s.Attr("style")
 		fmt.Println(n)
-		x.Image = "https:" + between(n,"('","')")
+		x.Image = "https:" + between(n, "('", "')")
 	})
 	x.URL = url
 	return x, nil

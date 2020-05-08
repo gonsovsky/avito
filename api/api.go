@@ -1,14 +1,14 @@
 package main
 
 import (
+	"avito/db"
+	. "avito/shared"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"newOne/db"
-	. "newOne/shared"
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +19,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 func allPages(w http.ResponseWriter, r *http.Request) {
 	var Pages []AvitoPage
 	Pages, err := db.AllPages()
-	if err != nil{
+	if err != nil {
 		json.NewEncoder(w).Encode(err)
 	} else {
 		json.NewEncoder(w).Encode(Pages)
@@ -29,8 +29,8 @@ func allPages(w http.ResponseWriter, r *http.Request) {
 func onePage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	page,err := db.OnePage(id)
-	if err != nil{
+	page, err := db.OnePage(id)
+	if err != nil {
 		json.NewEncoder(w).Encode(err)
 	} else {
 		json.NewEncoder(w).Encode(page)
@@ -42,7 +42,20 @@ func newPage(w http.ResponseWriter, r *http.Request) {
 	var page AvitoPage
 	json.Unmarshal(reqBody, &page)
 	res, err := db.NewPage(page)
-	if err != nil{
+	if err != nil {
+		json.NewEncoder(w).Encode(err)
+	} else {
+		json.NewEncoder(w).Encode(&res)
+	}
+}
+
+func updage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var page AvitoPage
+	json.Unmarshal(reqBody, &page)
+	res, err := db.UpdatePage(vars["id"], page)
+	if err != nil {
 		json.NewEncoder(w).Encode(err)
 	} else {
 		json.NewEncoder(w).Encode(&res)
@@ -51,19 +64,12 @@ func newPage(w http.ResponseWriter, r *http.Request) {
 
 func delPage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	URL := vars["URL"]
-	var page =  AvitoPage{
-		URL:      URL,
-		Title:    "",
-		Price:    "",
-		PriceInt: "",
-		Image:    "",
-	}
-	err := db.DelPage(page)
-	if err != nil{
+	id := vars["id"]
+	err := db.DelPage(id)
+	if err != nil {
 		json.NewEncoder(w).Encode(err)
 	} else {
-		json.NewEncoder(w).Encode("OK")
+		json.NewEncoder(w).Encode(id)
 	}
 }
 
@@ -71,6 +77,7 @@ func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/pages", allPages)
+	myRouter.HandleFunc("/page/{id}", updage).Methods("POST")
 	myRouter.HandleFunc("/page", newPage).Methods("POST")
 	myRouter.HandleFunc("/page/{id}", delPage).Methods("DELETE")
 	myRouter.HandleFunc("/page/{id}", onePage)

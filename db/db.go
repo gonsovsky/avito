@@ -1,13 +1,13 @@
 package db
 
 import (
+	. "avito/shared"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	. "newOne/shared"
-	"reflect"
 )
 
 var conStr = "mongodb+srv://db:Abc12345@cluster0-fqjlw.gcp.mongodb.net/test?retryWrites=true&w=majority"
@@ -41,12 +41,6 @@ func AllPages() ([]AvitoPage, error) {
 	return Pages, nil
 }
 
-func getField(v interface{}, field string) string {
-	r := reflect.ValueOf(v)
-	f := reflect.Indirect(r).Field(0)
-	return f.String()
-}
-
 func NewPage(page AvitoPage) (AvitoPage, error) {
 	clientOptions := options.Client().ApplyURI(conStr)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -55,15 +49,15 @@ func NewPage(page AvitoPage) (AvitoPage, error) {
 	}
 	ctx := context.TODO()
 	col := client.Database("db").Collection("avito")
-	res, err := col.InsertOne(ctx,page)
+	res, err := col.InsertOne(ctx, page)
 	if err != nil {
 		return AvitoPage{}, err
 	} else {
-		return OnePage(res.InsertedID)
+		return OnePageByObjectId(res.InsertedID)
 	}
 }
 
-func OnePage(id interface{}) (AvitoPage, error) {
+func OnePageByObjectId(id interface{}) (AvitoPage, error) {
 	clientOptions := options.Client().ApplyURI(conStr)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -72,15 +66,57 @@ func OnePage(id interface{}) (AvitoPage, error) {
 	var result = AvitoPage{}
 	ctx := context.TODO()
 	col := client.Database("db").Collection("avito")
-	var rx = col.FindOne(ctx, bson.M{"_id": id})
+	x := id
+	var rx = col.FindOne(ctx, bson.M{"_id": x})
 	rx.Decode(&result)
 	return result, nil
 }
 
-func UpdatePage(page AvitoPage) (error) {
-	return nil
+func OnePage(id string) (AvitoPage, error) {
+	x, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return AvitoPage{}, err
+	}
+	return OnePageByObjectId(x)
 }
 
-func DelPage(page AvitoPage) (error) {
+func UpdatePage(id string, page AvitoPage) (AvitoPage, error) {
+	clientOptions := options.Client().ApplyURI(conStr)
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		return AvitoPage{}, err
+	}
+	ctx := context.TODO()
+	col := client.Database("db").Collection("avito")
+	x, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return AvitoPage{}, err
+	}
+
+	update := bson.D{{"$set",
+		page,
+	}}
+
+	_, err = col.UpdateOne(ctx, bson.M{"_id": x}, update)
+	if err != nil {
+		return AvitoPage{}, err
+	} else {
+		return OnePage(id)
+	}
+}
+
+func DelPage(id string) error {
+	clientOptions := options.Client().ApplyURI(conStr)
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		return err
+	}
+	ctx := context.TODO()
+	col := client.Database("db").Collection("avito")
+	x, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	col.DeleteOne(ctx, bson.M{"_id": x})
 	return nil
 }

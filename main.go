@@ -1,7 +1,7 @@
 package main
 
 import (
-	"newOne/grabber"
+	"avito/grabber"
 )
 
 func main() {
