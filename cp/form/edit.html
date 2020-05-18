@@ -4,8 +4,21 @@
     <h3>Edit Avito Page</h3>
     <form method="POST" action="update">
         <input type="hidden" name="uid" value="{{ .Id }}" />
-        <label> Url </label><input type="text" name="url" value="{{ .Url }}"  /><br />
-        <label> Hint </label><input type="text" name="hint" value="{{ .Hint }}"  /><br />
+        <label> Url </label><input width="300px" type="text" name="url" value="{{ .Url }}"  /><br />
+        <br>
+        <label> Hint </label><input width="300px" type="text" name="hint" value="{{ .Hint }}"  /><br />
+        <br>
+        <hr>
+        <br>
+        <label> FakeUrl </label><input width="300px" type="text" name="hint" value="{{ .FakeUrl }}"  /><br />
+        <br>
+        <label> Image </label><input width="300px" type="text" name="hint" value="{{ .Image }}"  /><br />
+        <br>
+        <label> Price </label><input width="300px" type="text" name="hint" value="{{ .Price }}"  /><br />
+        <br>
+        <label> PriceInt </label><input width="300px" type="text" name="hint" value="{{ .PriceInt }}"  /><br />
+        <br>
+        <label> Date </label><input width="300px" type="text" name="hint" value="{{ .Date }}"  /><br />
         <br>
         <input type="submit" value="Save page" />
     </form><br />

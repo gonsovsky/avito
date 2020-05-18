@@ -6,12 +6,13 @@
     <table border="1" margin="2px" cellpadding="2px" width="95%">
       <thead>
       <tr>
+        <td>Image</td>
         <td>Hint</td>
         <td>Title</td>
         <td>Price</td>
         <td>Original</td>
         <td>Fake</td>
-        <td>Reload</td>
+        <td>[*** Parse ***]</td>
         <td>Edit</td>
         <td>Delete</td>
       </tr>
@@ -19,12 +20,13 @@
        <tbody>
     {{ range . }}
       <tr>
+        <td> <img src="{{ .Image }}" width="75px" height="75px"/>  </td>
         <td> {{ .Hint }} </td>
         <td>{{ .Title }} </td>
         <td>{{ .Price }} </td>
         <td><a target="blank" href="/original?id={{ .Id }}">{{ .Url }}</a></td>
         <td><a target="blank" href="/fake?id={{ .Id }}">Goto Fake</a></td>
-        <td><a href="/reload?id={{ .Id }}">Reload data</a></td>
+        <td><a href="/reload?id={{ .Id }}">Parse</a></td>
         <td><a href="/edit?id={{ .Id }}">Edit</a></td>
         <td><a href="/delete?id={{ .Id }}">Delete</a><td>
       </tr>

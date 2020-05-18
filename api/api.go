@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"avito/db"
@@ -84,6 +84,6 @@ func handleRequests() {
 	log.Fatal(http.ListenAndServe("0.0.0.0:9000", myRouter))
 }
 
-func main() {
+func NewApi() {
 	handleRequests()
 }

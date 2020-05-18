@@ -1,18 +1,29 @@
-package main
+package cp
 
 import (
 	"avito/db"
 	. "avito/shared"
 	"net/http"
+	"os"
+	"strings"
 	"text/template"
 )
 
-var tmpl = template.Must(template.ParseGlob("C:\\Users\\K\\go\\src\\avito\\cp\\form/*"))
+var tmpl *template.Template
+
+func load() {
+	var wqr, _ = os.Getwd()
+	wqr = wqr + "/cp/form/*"
+	var a = template.Must(template.ParseGlob(wqr))
+	tmpl = a
+}
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	res, err := db.AllPages()
 	if err != nil {
-		panic(err.Error())
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
 	}
 	tmpl.ExecuteTemplate(w, "Index", res)
 }
@@ -25,8 +36,11 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 	nId := r.URL.Query().Get("id")
 	res, err := db.OnePage(nId)
 	if err != nil {
-		panic(err.Error())
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
 	}
+	res.Id = nId
 	tmpl.ExecuteTemplate(w, "Edit", res)
 }
 
@@ -37,20 +51,27 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 		page.Hint = r.FormValue("hint")
 		_, err := db.NewPage(page)
 		if err != nil {
-			panic(err.Error())
+			e := map[string]interface{}{"err": err}
+			tmpl.ExecuteTemplate(w, "Error", e)
+			return
 		}
 	}
 	http.Redirect(w, r, "/", 301)
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	var page = AvitoPage{}
+	var page = AvitoLitePage{}
 	if r.Method == "POST" {
+		nId := r.FormValue("uid")
+
 		page.Url = r.FormValue("url")
 		page.Hint = r.FormValue("hint")
-		_, err := db.NewPage(page)
+
+		_, err := db.UpdatePageLight(nId, page)
 		if err != nil {
-			panic(err.Error())
+			e := map[string]interface{}{"err": err}
+			tmpl.ExecuteTemplate(w, "Error", e)
+			return
 		}
 	}
 	http.Redirect(w, r, "/", 301)
@@ -60,7 +81,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	nId := r.URL.Query().Get("id")
 	err := db.DelPage(nId)
 	if err != nil {
-		panic(err.Error())
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
 	}
 	http.Redirect(w, r, "/", 301)
 }
@@ -69,7 +92,9 @@ func Original(w http.ResponseWriter, r *http.Request) {
 	nId := r.URL.Query().Get("id")
 	res, err := db.OnePage(nId)
 	if err != nil {
-		panic(err.Error())
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
 	}
 	http.Redirect(w, r, res.Url, 301)
 }
@@ -78,21 +103,29 @@ func Fake(w http.ResponseWriter, r *http.Request) {
 	nId := r.URL.Query().Get("id")
 	res, err := db.OnePage(nId)
 	if err != nil {
-		panic(err.Error())
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
 	}
-	http.Redirect(w, r, res.Url, 301)
+	host := strings.Split(r.Host, ":")[0]
+	host = MainHost
+	fake := "http://www.avito.ru." + host + "/" + res.Id
+	http.Redirect(w, r, fake, 301)
 }
 
 func Reload(w http.ResponseWriter, r *http.Request) {
 	nId := r.URL.Query().Get("id")
-	res, err := db.OnePage(nId)
+	_, err := db.Parse(nId)
 	if err != nil {
-		panic(err.Error())
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
 	}
-	http.Redirect(w, r, res.Url, 301)
+	http.Redirect(w, r, "/", 301)
 }
 
-func main() {
+func NewCP() {
+	load()
 	http.HandleFunc("/", Index)
 	http.HandleFunc("/original", Original)
 	http.HandleFunc("/fake", Fake)

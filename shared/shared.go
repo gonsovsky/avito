@@ -5,8 +5,11 @@ import (
 	"time"
 )
 
+const MainHost = "avitowww.ru"
+
 type AvitoPage struct {
 	Hint     string
+	Number   string
 	Url      string
 	Title    string
 	Price    string
@@ -14,6 +17,11 @@ type AvitoPage struct {
 	Image    string
 	Date     time.Time
 	Id       string `json:"_id,omitempty" bson:"_id,omitempty"`
+}
+
+type AvitoLitePage struct {
+	Hint string
+	Url  string
 }
 
 func (page AvitoPage) Dump() {

@@ -3,42 +3,40 @@ package grabber
 import (
 	. "avito/shared"
 	"fmt"
-	"log"
+	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"strings"
 )
 
-func Grab(url string) (AvitoPage, error) {
-	x := AvitoPage{}
+func Grab(page AvitoPage) (AvitoPage, error) {
 
-	res, err := http.Get(url)
+	res, err := http.Get(page.Url)
 	if err != nil {
-		log.Fatal(err)
+		return page, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		return page, err
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return page, err
 	}
 
 	doc.Find("span.title-info-title-text").Each(func(_ int, s *goquery.Selection) {
-		x.Title = s.Text()
+		page.Title = s.Text()
 	})
 	doc.Find("span.js-item-price").Each(func(_ int, s *goquery.Selection) {
-		x.Price = s.Text()
-		x.PriceInt, _ = s.Attr("content")
+		page.Price = s.Text()
+		page.PriceInt, _ = s.Attr("content")
 	})
 	doc.Find("span.gallery-img-cover").Each(func(_ int, s *goquery.Selection) {
 		var n, _ = s.Attr("style")
 		fmt.Println(n)
-		x.Image = "https:" + between(n, "('", "')")
+		page.Image = "https:" + between(n, "('", "')")
 	})
-	x.URL = url
-	return x, nil
+	return page, nil
 }
 
 func between(value string, a string, b string) string {

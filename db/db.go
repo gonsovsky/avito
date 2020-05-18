@@ -1,6 +1,7 @@
 package db
 
 import (
+	"avito/grabber"
 	. "avito/shared"
 	"context"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 	"time"
 )
 
-var conStr = "mongodb+srv://db:Abc12345@cluster0-fqjlw.gcp.mongodb.net/test?retryWrites=true&w=majority"
+var conStr = "mongodb://mongo-root:passw0rd@" + MainHost
 
 func AllPages() ([]AvitoPage, error) {
 	clientOptions := options.Client().ApplyURI(conStr)
@@ -107,6 +108,31 @@ func UpdatePage(id string, page AvitoPage) (AvitoPage, error) {
 	}
 }
 
+func UpdatePageLight(id string, page AvitoLitePage) (AvitoPage, error) {
+	clientOptions := options.Client().ApplyURI(conStr)
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		return AvitoPage{}, err
+	}
+	ctx := context.TODO()
+	col := client.Database("db").Collection("avito")
+	x, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return AvitoPage{}, err
+	}
+
+	update := bson.D{{"$set",
+		page,
+	}}
+
+	_, err = col.UpdateOne(ctx, bson.M{"_id": x}, update)
+	if err != nil {
+		return AvitoPage{}, err
+	} else {
+		return OnePage(id)
+	}
+}
+
 func DelPage(id string) error {
 	clientOptions := options.Client().ApplyURI(conStr)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -121,4 +147,21 @@ func DelPage(id string) error {
 	}
 	col.DeleteOne(ctx, bson.M{"_id": x})
 	return nil
+}
+
+func Parse(id string) (AvitoPage, error) {
+	page, err := OnePage(id)
+	if err != nil {
+		return page, err
+	}
+	page, err = grabber.Grab(page)
+	if err != nil {
+		return page, err
+	}
+	page.Id = ""
+	page, err = UpdatePage(id, page)
+	if err != nil {
+		return page, err
+	}
+	return page, nil
 }
