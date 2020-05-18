@@ -2,29 +2,26 @@
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
-ERROR_REPORTING(E_ALL);
+ERROR_REPORTING(0);
+$isOk=true;
 require 'vendor/autoload.php';
 
    try {
-
-
-    $id="5ec24750cbb6ebde40c59195";
-
-        if (in_array("REQUEST_URI", $_SERVER)) {
             $id = $_SERVER['REQUEST_URI'];
-            $id = substr($id, 1);
-        }
+            $strArray = explode('/',$id);
+            $id = end($strArray);
 
-    $mongo = new MongoDB\Client("mongodb://mongo-root:passw0rd@127.0.0.1:27017");
-    $collection = $mongo->db->avito;
-    $bid = new MongoDB\BSON\ObjectID($id);
-    $result = $collection->findOne(array('_id' => $bid));
-    $view = (object) array();
-
-    $view->Title = $result["title"];
-    $view->Price = "0";
+       //var_dump($id);
+       $url="http://localhost:9000/page/".$id;
+       $json = file_get_contents($url);
+       $view = json_decode($json);
+       $view->PriceDeliver = intval($view->PriceInt) + 290;
+       if (array_key_exists("Title",$view) ==false)
+       $isOk = false;
+       //var_dump($view);
         }
         catch (Exception $e) {
+            $isOk = false;
             echo $e->getMessage();
             die();
         }
