@@ -1,10 +1,11 @@
 package main
 
 import (
+	"avito/api"
 	"avito/cp"
 )
 
 func main() {
-	//go api.NewApi();
+	go api.NewApi()
 	cp.NewCP()
 }
