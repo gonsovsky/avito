@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -73,7 +72,12 @@ func delPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleRequests() {
+func NewApi() {
+	defer func() {
+		if r := recover(); r != nil {
+			Log("(NewApi) Recovered in f", r)
+		}
+	}()
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/pages", allPages)
@@ -81,9 +85,5 @@ func handleRequests() {
 	myRouter.HandleFunc("/page", newPage).Methods("POST")
 	myRouter.HandleFunc("/page/{id}", delPage).Methods("DELETE")
 	myRouter.HandleFunc("/page/{id}", onePage)
-	log.Fatal(http.ListenAndServe("0.0.0.0:9000", myRouter))
-}
-
-func NewApi() {
-	handleRequests()
+	Log(http.ListenAndServe("0.0.0.0:9000", myRouter))
 }

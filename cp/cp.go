@@ -135,5 +135,8 @@ func NewCP() {
 	http.HandleFunc("/insert", Insert)
 	http.HandleFunc("/update", Update)
 	http.HandleFunc("/delete", Delete)
-	http.ListenAndServe("0.0.0.0:9001", nil)
+	error := http.ListenAndServe("0.0.0.0:9001", nil)
+	if error != nil {
+		Log(error)
+	}
 }
