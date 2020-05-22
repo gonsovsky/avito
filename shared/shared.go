@@ -30,3 +30,11 @@ func (page AvitoPage) Dump() {
 	fmt.Println(page.PriceInt)
 	fmt.Println(page.Image)
 }
+
+type AvitoOrder struct {
+	PageId string
+	Amount string
+	Name   string
+	Date   time.Time
+	Id     string `json:"_id,omitempty" bson:"_id,omitempty"`
+}

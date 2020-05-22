@@ -48,6 +48,18 @@ func newPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func newOrder(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var order AvitoOrder
+	json.Unmarshal(reqBody, &order)
+	res, err := db.NewOrder(order)
+	if err != nil {
+		json.NewEncoder(w).Encode(err)
+	} else {
+		json.NewEncoder(w).Encode(&res)
+	}
+}
+
 func updage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
