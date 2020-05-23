@@ -3,22 +3,36 @@
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 ERROR_REPORTING(0);
-$isOk=true;
-require 'vendor/autoload.php';
-
    try {
-            $id = $_SERVER['REQUEST_URI'];
-            $strArray = explode('/',$id);
-            $id = end($strArray);
+   $arr = array
+   (
+   'page_id' => $_POST["page_id"],
+   'name' => $_POST["name"],
+   'amount' => $_POST["amount"],
+   'address' => $_POST["address"],
+   'flat'  => $_POST["flat"],
+   'lastname'  => $_POST["lastname"],
+   'firstname'  => $_POST["firstname"],
+   'middlename'  => $_POST["middlename"],
+   'phone'  => $_POST["phone"],
+   );
 
-       //var_dump($id);
-       $url="http://localhost:9000/page/".$id;
-       $json = file_get_contents($url);
-       $view = json_decode($json);
-       $view->PriceDeliver = intval($view->PriceInt) + 290;
-       if (array_key_exists("Title",$view) ==false)
-       $isOk = false;
-       //var_dump($view);
+   $options = array(
+     'http' => array(
+       'method'  => 'POST',
+       'content' => json_encode( $arr ),
+       'header'=>  "Content-Type: application/json\r\n" .
+                   "Accept: application/json\r\n"
+       )
+   );
+       $url ="http://localhost:9000/order";
+       var_dump($options);
+
+       $context  = stream_context_create( $options );
+       $result = file_get_contents( $url, false, $context );
+       $response = json_decode( $result );
+
+      var_dump($response);
         }
         catch (Exception $e) {
             $isOk = false;

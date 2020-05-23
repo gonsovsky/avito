@@ -1,34 +1,30 @@
 {{ define "Index" }}
   {{ template "Header" }}
     {{ template "Menu"  }}
-    <h3> Registered </h3>
+    <h3> Orders </h3>
     <center>
     <table border="1" margin="2px" cellpadding="2px" width="95%">
       <thead>
       <tr>
-        <td>Image</td>
-        <td>Hint</td>
-        <td>Title</td>
-        <td>Price</td>
-        <td>Original</td>
-        <td>Fake</td>
-        <td>[*** Parse ***]</td>
-        <td>Edit</td>
+        <td>Date</td>
+        <td>Name</td>
+        <td>Amount</td>
+        <td>Avito Page</td>
+        <td>Fake Page</td>
+        <td>Details</td>
         <td>Delete</td>
       </tr>
        </thead>
        <tbody>
     {{ range . }}
       <tr>
-        <td> <img src="{{ .Image }}" width="75px" height="75px"/>  </td>
-        <td> {{ .Hint }} </td>
-        <td>{{ .Title }} </td>
-        <td>{{ .Price }} </td>
-        <td><a target="blank" href="/original?id={{ .Id }}">{{ .Url }}</a></td>
-        <td><a target="blank" href="/fake?id={{ .Id }}">Goto Fake</a></td>
-        <td><a href="/reload?id={{ .Id }}">Parse</a></td>
-        <td><a href="/edit?id={{ .Id }}">Edit</a></td>
-        <td><a href="/delete?id={{ .Id }}">Delete</a><td>
+        <td> <img src="{{ .Date }}" width="75px" height="75px"/>  </td>
+        <td> {{ .Name }} </td>
+        <td>{{ .Amount }} </td>
+        <td><a target="blank" href="/original?id={{ .PageId }}">Goto original</a></td>
+        <td><a target="blank" href="/fake?id={{ .PageId }}">Goto Fake</a></td>
+        <td><a href="/order/details?id={{ .Id }}">Details</a></td>
+        <td><a href="/order/delete?id={{ .Id }}">Delete</a><td>
       </tr>
     {{ end }}
        </tbody>

@@ -2,9 +2,8 @@
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
-ERROR_REPORTING(0);
+ERROR_REPORTING(E_ALL);
 $isOk=true;
-require 'vendor/autoload.php';
 
    try {
             $id = $_SERVER['REQUEST_URI'];
@@ -16,7 +15,7 @@ require 'vendor/autoload.php';
        $json = file_get_contents($url);
        $view = json_decode($json);
        $view->PriceDeliver = intval($view->PriceInt) + 290;
-       if (array_key_exists("Title",$view) ==false)
+       if (property_exists($view, "Title") ==false)
        $isOk = false;
        //var_dump($view);
         }

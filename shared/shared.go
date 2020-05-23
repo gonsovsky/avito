@@ -32,9 +32,15 @@ func (page AvitoPage) Dump() {
 }
 
 type AvitoOrder struct {
-	PageId string
-	Amount string
-	Name   string
-	Date   time.Time
-	Id     string `json:"_id,omitempty" bson:"_id,omitempty"`
+	PageId     string `json:"page_id,omitempty" bson:"page_id,omitempty"`
+	Amount     string
+	Name       string
+	Address    string
+	Flat       string
+	LastName   string
+	FirstName  string
+	MiddleName string
+	Phone      string
+	Date       time.Time
+	Id         string `json:"_id,omitempty" bson:"_id,omitempty"`
 }

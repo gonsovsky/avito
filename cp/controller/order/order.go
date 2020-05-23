@@ -24,13 +24,25 @@ func Load() {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	res, err := db.AllPages()
+	res, err := db.AllOrders()
 	if err != nil {
 		e := map[string]interface{}{"err": err}
 		tmpl.ExecuteTemplate(w, "Error", e)
 		return
 	}
 	tmpl.ExecuteTemplate(w, "Index", res)
+}
+
+func Edit(w http.ResponseWriter, r *http.Request) {
+	nId := r.URL.Query().Get("id")
+	res, err := db.OnePage(nId)
+	if err != nil {
+		e := map[string]interface{}{"err": err}
+		tmpl.ExecuteTemplate(w, "Error", e)
+		return
+	}
+	res.Id = nId
+	tmpl.ExecuteTemplate(w, "Edit", res)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {

@@ -19,8 +19,10 @@ func NewCP() {
 	http.HandleFunc("/update", avito.Update)
 	http.HandleFunc("/delete", avito.Delete)
 
+	order.Load()
 	http.HandleFunc("/orders", order.Index)
-	http.HandleFunc("/order", order.Delete)
+	http.HandleFunc("/order/delete", order.Delete)
+	http.HandleFunc("/order/details", order.Edit)
 
 	error := http.ListenAndServe("0.0.0.0:9001", nil)
 	if error != nil {
